@@ -1,9 +1,152 @@
-import example.pepita
+import empresaYPaquetes.*
+import destinos.*
+import mensajerosYEquipo.*
 
-describe "group of tests for pepita" {
+describe "grupo de test para los mensajeros" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+  test "Roberto (90kg) puede llevar un paquete que está pago en un camión que tiene un acoplado" {
+    camion.agregarAcoplados(1)
+    roberto.viajaEn(camion)
+    assert.that(roberto.puedeEntregarPaquete(paquete))
   }
 
+  test "Neo con crédito no puede llevar un paquete que no está pago a la matrix" {
+    paquete.cambiarEstadoDePago()
+    paquete.cambiarDestino(laMatrix)
+    assert.notThat(neo.puedeEntregarPaquete(paquete))
+  }
+
+   test "Roberto (90kg) no puede llevar un paquete que está pago en un camión que tiene 2 acoplados" {
+    camion.agregarAcoplados(2)
+    roberto.viajaEn(camion)
+    assert.notThat(roberto.puedeEntregarPaquete(paquete))
+  }
+
+}
+
+describe "grupo de test para la empresa" {
+  test "La empresa contrato a Neo" {
+    empresa.contratarunEmpleado(neo)
+    assert.that(empresa.empleados().contains(neo))
+  }
+
+  test "La empresa despidio a Neo" {
+    empresa.contratarunEmpleado(neo)
+    empresa.despedirUnEmpleado(neo)
+    assert.notThat(empresa.empleados().contains(neo))
+  }
+
+  test "La empresa contrato a Roberto, Chuck y Neo pero despues despidieron a todos" {
+    empresa.contratarunEmpleado(neo)
+    empresa.contratarunEmpleado(roberto)
+    empresa.contratarunEmpleado(chuckNorris)
+    empresa.despedirATodosLosEmpleados()
+    assert.that(empresa.empleados().isEmpty())
+  }
+
+  test "La empresa contrato a Roberto, Chuck y Neo por ende es grande" {
+    empresa.contratarunEmpleado(neo)
+    empresa.contratarunEmpleado(roberto)
+    empresa.contratarunEmpleado(chuckNorris)
+    assert.that(empresa.esGrande())
+  }
+
+   test "La empresa contrato a Roberto y Neo por ende no es grande" {
+    empresa.contratarunEmpleado(neo)
+    empresa.contratarunEmpleado(roberto)
+    assert.notThat(empresa.esGrande())
+  }
+
+  test "El primer mensajero de la lista (chuck) puede entregar el paquete en el puente" {
+    empresa.contratarunEmpleado(chuckNorris)
+    empresa.contratarunEmpleado(roberto)
+    assert.that(empresa.elPrimerEmpleadoPuedeEntregarPaquete(paquete))
+  }
+
+  test "El primer empleado de la lista (roberto) no puede entregar el paquete en el puente por su peso" {
+    empresa.contratarunEmpleado(roberto)
+    empresa.contratarunEmpleado(chuckNorris)
+    camion.agregarAcoplados(2)
+    roberto.viajaEn(camion)
+    assert.notThat(empresa.elPrimerEmpleadoPuedeEntregarPaquete(paquete))
+  }
+
+  test "El ultimo mensajero (chuck) pesa 80 kilos" {
+    empresa.contratarunEmpleado(roberto)
+    empresa.contratarunEmpleado(chuckNorris)
+    assert.equals(80, empresa.pesoDelUltimoEmpleado())
+  }
+
+  test "la empresa tiene algun empleado que pueda llevar el paquetito a la matrix" {
+    empresa.contratarunEmpleado(chuckNorris)
+    paquetito.cambiarDestino(laMatrix)
+    empresa.contratarunEmpleado(roberto)
+    assert.that(empresa.sePuedeEntregarElPaquete(paquetito))
+  }
+
+  test "Chuck y neo son los mensajeros de la empresa que puede ir a la matrix" {
+    empresa.contratarunEmpleado(roberto)
+    empresa.contratarunEmpleado(neo)
+    empresa.contratarunEmpleado(chuckNorris)
+    paquete.cambiarDestino(laMatrix)
+    assert.equals([neo , chuckNorris] , empresa.mensajerosQuePuedenLlevarUnPaquete(paquete))
+  }
+
+  test "Roberto tiene 2 acoplados en su camion y trabaja con chuck, por ende la empresa tiene sobrepeso" {
+    camion.agregarAcoplados(2)
+    roberto.viajaEn(camion)
+    empresa.contratarunEmpleado(roberto)
+    empresa.contratarunEmpleado(chuckNorris)
+    assert.that(empresa.laEmpresaTieneSobrepeso())
+  }
+
+  test "El paqueton viajero no puede ser enviado por roberto, porque uno de sus destinos es la matrix" {
+    paquetonViajero.agregarDestino(laMatrix)
+    paquetonViajero.agregarDestino(puenteDeBrooklyn)
+    paquetonViajero.pagarElPaquete(200)
+    assert.notThat(paquetonViajero.sePuedeEnviarPorElMensajero(roberto))
+  }
+
+   test "El paqueton viajero puede ser enviado por Chuck" {
+    paquetonViajero.agregarDestino(laMatrix)
+    paquetonViajero.agregarDestino(puenteDeBrooklyn)
+    paquetonViajero.pagarElPaquete(200)
+    assert.that(paquetonViajero.sePuedeEnviarPorElMensajero(chuckNorris))
+  }
+
+    test "la empresa puede enviar 3 paquetes" {
+    empresa.contratarunEmpleado(chuckNorris)
+    empresa.enviarPaquetesADestino([paquete , paquete , paquete])
+    assert.equals(150, empresa.facturacion())
+  }
+
+    test "la empresa no puede enviar 3 paquetes y van a pendientes" {
+    empresa.contratarunEmpleado(chuckNorris)
+    paquete.cambiarEstadoDePago()
+    empresa.enviarPaquetesADestino([paquete , paquete , paquete])
+    assert.equals([paquete , paquete , paquete] , empresa.pendientes())
+  }
+
+    test "la empresa puede enviar 3 paquetes excepto el paqueton viajero que va a pendientes" {
+    empresa.contratarunEmpleado(roberto)
+    paquetonViajero.agregarDestino(laMatrix)
+    paquetonViajero.agregarDestino(puenteDeBrooklyn)
+    paquetonViajero.pagarElPaquete(200)
+    empresa.enviarPaquetesADestino([paquete , paquete , paquetonViajero])
+    assert.equals([paquetonViajero] , empresa.pendientes())
+  }
+
+    test "la empresa envia su paquete pendiente mas caro y su facturacion sube a 300" {
+    empresa.contratarunEmpleado(roberto)
+    paquetonViajero.agregarDestino(laMatrix)
+    paquetonViajero.agregarDestino(puenteDeBrooklyn)
+    paquetonViajero.pagarElPaquete(200)
+    empresa.enviarPaquetesADestino([paquete , paquete , paquetonViajero])
+    paquete.cambiarEstadoDePago()
+    empresa.enviarPaqueteADestino(paquete)
+    empresa.contratarunEmpleado(chuckNorris)
+    paquete.cambiarEstadoDePago()
+    empresa.enviarElPendienteMasCaro()
+    assert.equals(300 , empresa.facturacion())
+  }
 }
