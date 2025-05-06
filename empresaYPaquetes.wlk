@@ -34,7 +34,7 @@ object empresa {
 
   method elPrimerEmpleadoPuedeEntregarPaquete(paquete) {
     return
-        empleados.first().puedeEntregarPaquete(paquete)
+        paquete.sePuedeEnviarPorElMensajero(empleados.first())
   }
 
   method pesoDelUltimoEmpleado() {
@@ -48,12 +48,12 @@ object empresa {
 
   method sePuedeEntregarElPaquete(paquete) {
     return
-      empleados.any({b=>b.puedeEntregarPaquete(paquete)})
+      empleados.any({m=>paquete.sePuedeEnviarPorElMensajero(m)})
   }
 
   method mensajerosQuePuedenLlevarUnPaquete(paquete) {
     return
-      empleados.filter({b=>b.puedeEntregarPaquete(paquete)})
+      empleados.filter({m=>paquete.sePuedeEnviarPorElMensajero(m)})
   }
 
   method laEmpresaTieneSobrepeso() {

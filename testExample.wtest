@@ -7,19 +7,19 @@ describe "grupo de test para los mensajeros" {
   test "Roberto (90kg) puede llevar un paquete que está pago en un camión que tiene un acoplado" {
     camion.agregarAcoplados(1)
     roberto.viajaEn(camion)
-    assert.that(roberto.puedeEntregarPaquete(paquete))
+    assert.that(paquete.sePuedeEnviarPorElMensajero(roberto))
   }
 
   test "Neo con crédito no puede llevar un paquete que no está pago a la matrix" {
     paquete.cambiarEstadoDePago()
     paquete.cambiarDestino(laMatrix)
-    assert.notThat(neo.puedeEntregarPaquete(paquete))
+    assert.notThat(paquete.sePuedeEnviarPorElMensajero(neo))
   }
 
    test "Roberto (90kg) no puede llevar un paquete que está pago en un camión que tiene 2 acoplados" {
     camion.agregarAcoplados(2)
     roberto.viajaEn(camion)
-    assert.notThat(roberto.puedeEntregarPaquete(paquete))
+    assert.notThat(paquete.sePuedeEnviarPorElMensajero(roberto))
   }
 
 }

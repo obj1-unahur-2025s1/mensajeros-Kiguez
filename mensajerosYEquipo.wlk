@@ -10,22 +10,12 @@ object roberto {
   }
 
   method puedeLlamar() = false
-
-  method puedeEntregarPaquete(paquete) {
-    return
-      paquete.sePuedeEnviarPorElMensajero(self)
-  }
 }
 
 object chuckNorris {
   method peso() = 80
 
   method puedeLlamar() = true
-
- method puedeEntregarPaquete(paquete) {
-    return
-      paquete.sePuedeEnviarPorElMensajero(self)
-  }
 }
 
 object neo {
@@ -38,11 +28,6 @@ object neo {
 
   method cambiarEstadoDeLlamada() {
     puedeLlamar = not puedeLlamar
-  }
-
-  method puedeEntregarPaquete(paquete) {
-    return
-      paquete.sePuedeEnviarPorElMensajero(self)
   }
 }
 
